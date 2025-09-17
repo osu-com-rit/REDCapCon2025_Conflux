@@ -1,226 +1,247 @@
-# Zip Creator Script
+# REDCap Conflux Demo Zip Creator
 
-A shell script that automatically creates zip files from REDCap Conflux demo folders for easy distribution and deployment.
+A simple script to package REDCap Conflux demo files into distributable zip archives.
 
-## What it does
+## Overview
 
-This script scans your project directory for demo folders and creates compressed zip files containing all the necessary files (HTML, CSS, JavaScript, JSON) while excluding development artifacts like .git folders and temporary files.
+This script creates zip packages from REDCap Conflux demo files in your current directory. It automatically includes common web development files (HTML, CSS, JavaScript, JSON) and documentation while excluding system files and temporary files.
 
 ## Features
 
-- **Selective packaging**: Only includes relevant files (HTML, CSS, JS, JSON, README)
-- **Automatic exclusions**: Skips development files (.git, .tmp, .DS_Store, etc.)
-- **Batch processing**: Create zips for all demos or target specific ones
-- **Size reporting**: Shows compressed file sizes after creation
-- **Configurable compression**: Adjustable compression levels (0-9)
-- **Error handling**: Validates directories and provides clear feedback
+- ✅ Automatically detects and includes relevant files
+- ✅ Excludes unwanted system files (.DS_Store, .git*, etc.)
+- ✅ Configurable output names
+- ✅ File listing and preview functionality
+- ✅ Colored terminal output for better visibility
+- ✅ Error handling and validation
 
-## Requirements
+## Prerequisites
 
-- **macOS** or **Linux** system
-- **zip** command-line utility (usually pre-installed)
-- Proper read permissions for source directories
-- Write permissions for output directory
+- **Unix-like system** (macOS, Linux, or Windows with Git Bash/WSL)
+- **zip command** (usually pre-installed on macOS and most Linux distributions)
 
-### Checking zip installation
-```bash
-zip --version
-```
+## Installation
 
-If not installed:
-- **Ubuntu/Debian**: `sudo apt-get install zip`
-- **CentOS/RHEL**: `sudo yum install zip` 
-- **Windows**: Use Git Bash or install via Chocolatey
+1. Clone or download the REDCap Conflux demo repository:
+   ```bash
+   git clone https://github.com/osu-com-rit/REDCapCon2025_Conflux.git
+   cd REDCapCon2025_Conflux
+   ```
+
+2. Copy the zip creator script to the demo directory:
+   ```bash
+   cp simple_zip_creator.sh rc_conflux_demo/
+   ```
+
+3. Change to the demo directory (this is important):
+   ```bash
+   cd rc_conflux_demo
+   ```
+
+4. Make the script executable:
+   ```bash
+   chmod +x simple_zip_creator.sh
+   ```
+
+**Important:** The script must be run from within the `rc_conflux_demo` directory where your demo files are located. The script looks for files in the current working directory.
 
 ## Usage
 
-### Make the script executable
+### Basic Usage
+
+**Important:** Always run the script from within the `rc_conflux_demo` directory.
+
+Create a zip with the default name (`rc_conflux_demo.zip`):
 ```bash
-chmod +x zip_creator.sh
+cd rc_conflux_demo
+./simple_zip_creator.sh
 ```
 
-### Basic commands
-
-**Create zips for all demo folders:**
+Create a zip with a custom name:
 ```bash
-./zip_creator.sh -a
+cd rc_conflux_demo
+./simple_zip_creator.sh my_custom_demo
 ```
 
-**List available demo folders:**
-```bash
-./zip_creator.sh -l
-```
-
-**Create zip for specific demo:**
-```bash
-./zip_creator.sh rc_conflux_demo
-```
+### Options
 
 **Show help:**
 ```bash
-./zip_creator.sh -h
+cd rc_conflux_demo
+./simple_zip_creator.sh --help
+./simple_zip_creator.sh -h
+```
+
+**List files that would be included (dry run):**
+```bash
+cd rc_conflux_demo
+./simple_zip_creator.sh --list
+./simple_zip_creator.sh -l
+```
+
+## File Inclusion Rules
+
+### Included Files
+The script automatically includes files matching these patterns:
+- `*.html` - HTML files
+- `*.css` - Stylesheet files  
+- `*.js` - JavaScript files
+- `*.json` - JSON configuration files
+- `README.md` - Documentation
+- `*.md` - Other Markdown files
+
+### Excluded Files
+The script automatically excludes:
+- `.DS_Store` - macOS system files
+- `*.tmp` - Temporary files
+- `*.log` - Log files
+- `.git*` - Git repository files
+- `node_modules` - Node.js dependencies
+
+## Output
+
+### Directory Structure
+After cloning the repository and setting up the script:
+```
+REDCapCon2025_Conflux/
+├── simple_zip_creator.sh        # Copy this to rc_conflux_demo/
+├── rc_conflux_demo/              # Work from this directory
+│   ├── simple_zip_creator.sh     # Script location
+│   ├── rc_demo.html
+│   ├── rc_demo.css
+│   ├── rc_demo.js
+│   ├── loader_config.json
+│   ├── README.md
+│   └── zip_packages/             # Created automatically
+│       └── rc_conflux_demo.zip
+└── other_files...
+
+### Script Output
+The script provides clear feedback:
+```
+==================================================
+REDCap Conflux Demo Zip Creator
+==================================================
+Current directory: /path/to/your/demo
+Output directory: zip_packages
+
+Checking for files to include...
+  Found 1 file(s) matching: *.html
+  Found 1 file(s) matching: *.css
+  Found 1 file(s) matching: *.js
+  Found 1 file(s) matching: *.json
+  Found 1 file(s) matching: README.md
+
+Creating zip file: rc_conflux_demo.zip
+Success! Created zip file with 5 files (15K)
+Location: zip_packages/rc_conflux_demo.zip
+
+Zip contents:
+  rc_demo.html
+  rc_demo.css
+  rc_demo.js
+  loader_config.json
+  README.md
+
+Zip creation completed successfully!
 ```
 
 ## Configuration
 
-Edit the script variables to match your setup:
+You can modify the script's behavior by editing these variables at the top:
 
 ```bash
-# Base directory containing demo folders
-BASE_DIR="/Users/PATH/REDCapCon2025_Conflux"
+# Default output name
+DEFAULT_OUTPUT_NAME="rc_conflux_demo"
 
-# Output directory for zip files  
-OUTPUT_DIR="$BASE_DIR/zip_packages"
+# Output directory
+OUTPUT_DIR="zip_packages"
 
-# Files to include (patterns)
-INCLUDE_FILES=("*.html" "*.css" "*.js" "*.json" "README.md")
-
-# Files to exclude (patterns)
-EXCLUDE_PATTERNS=(".git*" "*.tmp" "*.log" ".DS_Store" "node_modules")
-
-# Compression level (0-9, where 9 is highest)
+# Compression level (0-9)
 COMPRESSION_LEVEL=6
-```
 
-## File Filtering
+# File patterns to include
+INCLUDE_PATTERNS=("*.html" "*.css" "*.js" "*.json" "README.md" "*.md")
 
-### Included by default:
-- `*.html` - HTML template files
-- `*.css` - Stylesheet files  
-- `*.js` - JavaScript files
-- `*.json` - Configuration files
-- `README.md` - Documentation
-
-### Excluded by default:
-- `.git*` - Git repository files
-- `*.tmp` - Temporary files
-- `*.log` - Log files
-- `.DS_Store` - macOS system files
-- `node_modules` - Node.js dependencies
-
-## Output Structure
-
-The script creates a `zip_packages` folder containing:
-```
-zip_packages/
-├── rc_conflux_demo.zip
-├── another_demo.zip
-└── third_demo.zip
-```
-
-Each zip contains the demo's essential files:
-```
-demo.zip
-├── loader_config.json
-├── demo.html
-├── demo.css  
-├── demo.js
-└── README.md
+# Files to exclude
+EXCLUDE_PATTERNS=(".DS_Store" "*.tmp" "*.log" ".git*" "node_modules")
 ```
 
 ## Examples
 
-### Create all zips with verbose output:
+### Example 1: Basic Demo Package
 ```bash
-./zip_creator.sh -a
-```
-Output:
-```
-======================================================
-REDCap Conflux Zip Creator Script  
-======================================================
-Base directory: /Users/PATH/REDCapCon2025_Conflux
-Output directory: /Users/PATH/REDCapCon2025_Conflux/zip_packages
+# Your directory contains:
+# - rc_demo.html
+# - rc_demo.css  
+# - rc_demo.js
+# - loader_config.json
+# - README.md
 
-Creating zip files for all demo folders...
+./simple_zip_creator.sh
 
-Processing: rc_conflux_demo
-  ✓ Created: rc_conflux_demo.zip (15K)
-Processing: another_demo  
-  ✓ Created: another_demo.zip (12K)
-
-Summary: 2/2 zip files created successfully
+# Creates: zip_packages/rc_conflux_demo.zip
 ```
 
-### Target specific demo:
+### Example 2: Custom Named Package
 ```bash
-./zip_creator.sh Example/rc_conflux_demo
+./simple_zip_creator.sh patient_dashboard_demo
+
+# Creates: zip_packages/patient_dashboard_demo.zip
 ```
 
-### List available demos:
+### Example 3: Preview Before Creating
 ```bash
-./zip_creator.sh -l
-```
-Output:
-```
-Available demo folders:
-  1. Example/rc_conflux_demo
-  2. File Synchronization
+./simple_zip_creator.sh -l
+
+# Shows what files would be included without creating zip
 ```
 
 ## Troubleshooting
 
-### Script won't run
-- Check file permissions: `ls -la zip_creator.sh`
-- Make executable: `chmod +x zip_creator.sh`
-- Verify zip installation: `zip --version`
+### "No matching files found"
+- **Check your working directory:** Ensure you're in the `rc_conflux_demo` directory, not the parent directory
+- **Verify the repository structure:** Make sure you've cloned from https://github.com/osu-com-rit/REDCapCon2025_Conflux
+- Use `pwd` to confirm you're in the right location: `/path/to/REDCapCon2025_Conflux/rc_conflux_demo`
+- Use `./simple_zip_creator.sh -l` to see what the script detects
 
-### No zip files created
-- Confirm BASE_DIR path exists and contains demo folders
-- Check that demo folders contain the expected file types
-- Verify write permissions for OUTPUT_DIR
+### "zip command not found"
+- **macOS:** zip should be pre-installed
+- **Ubuntu/Debian:** `sudo apt-get install zip`
+- **CentOS/RHEL:** `sudo yum install zip`
+- **Windows:** Use Git Bash or install via Chocolatey: `choco install zip`
 
 ### Permission errors
-- Ensure read access to source directories
-- Check write permissions for output directory
-- Run with appropriate user privileges
+- Make sure the script is executable: `chmod +x simple_zip_creator.sh`
+- Ensure you have write permissions in the current directory
 
-### Empty zip files
-- Verify INCLUDE_FILES patterns match your actual files
-- Check that files aren't being caught by EXCLUDE_PATTERNS
-- Test manually: `ls *.html *.css *.js *.json` in demo folder
+### Script won't run
+- Check the shebang line points to bash: `#!/bin/bash`
+- Try running with: `bash simple_zip_creator.sh`
 
-## Customization
+## Integration with REDCap Conflux
 
-### Add new file types:
-```bash
-INCLUDE_FILES=("*.html" "*.css" "*.js" "*.json" "*.md" "*.txt")
-```
+This zip creator is designed to work with the REDCap Conflux development workflow:
 
-### Exclude additional patterns:
-```bash
-EXCLUDE_PATTERNS=(".git*" "*.tmp" "*.log" ".DS_Store" "backup*")
-```
-
-### Change compression level:
-```bash
-COMPRESSION_LEVEL=9  # Maximum compression (slower)
-COMPRESSION_LEVEL=1  # Minimal compression (faster)
-```
-
-### Different output location:
-```bash
-OUTPUT_DIR="/Users/your-name/Desktop/conflux-packages"
-```
-
-## Integration with Development Workflow
-
-1. **Develop** your Conflux demos in individual folders
-2. **Test** using the sync script for live updates  
-3. **Package** with this zip creator when ready for distribution
-4. **Deploy** zip files to REDCap environments
-
-## Script Limitations
-
-- Only processes folders (not individual files)
-- Requires specific directory structure
-- Depends on file extensions for filtering
-- No built-in compression format options (only zip)
+1. **Development Phase:** Work on your demo files using Conflux Loader
+2. **Testing Phase:** Test your demo in your local REDCap environment
+3. **Packaging Phase:** Use this script to create distributable packages
+4. **Distribution Phase:** Share the zip files with colleagues or deploy to production
 
 ## Contributing
 
-To modify this script:
-1. Test changes with `-l` option first
-2. Use small test directories to verify filtering
-3. Check cross-platform compatibility if needed
-4. Update documentation for any new features
+To modify or extend this script:
+
+1. The main logic is in the `create_zip()` function
+2. File patterns are configured in the arrays at the top
+3. Add new functionality as separate functions
+4. Maintain the colored output for user experience
+
+## License
+
+This script is provided as-is for REDCap Conflux development workflows. Feel free to modify and distribute according to your organization's policies.
+
+---
+
+**Created for REDCap Conflux Demo Packaging**  
+*Simplifying the path from prototype to production*

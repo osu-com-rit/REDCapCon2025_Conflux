@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
              * @param {Element} el - DOM element to analyze
              * @returns {string} - Field type or 'field' as fallback
              */
-            const typeFrom = (el) => ((el.className || "").match(/edc-(radio|checkbox|slider|text|notes)/) || [, 'field'])[1];
+            const typeFrom = (el) => ((el.className || "").match(/edc-(radio|checkbox|slider|text|notes|dropdown)/) || [, 'field'])[1];
 
             // Structure Transformation
             // ========================

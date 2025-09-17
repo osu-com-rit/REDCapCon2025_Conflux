@@ -7,7 +7,7 @@ Repository for REDCap Con 2025 Conflux demonstrations featuring dynamic form lay
 ```
 REDCapCon2025_Conflux/
 ├── Creating Zip Files/
-│   ├── zip_creator.sh           # Automated zip creation script
+│   ├── zip_creator.sh           # Original automated zip creation script
 │   └── README.md                # Zip tool documentation
 ├── Example/
 │   └── rc_conflux_demo/         # Main layout switcher demo
@@ -19,6 +19,7 @@ REDCapCon2025_Conflux/
 ├── File Synchronization/
 │   ├── sync_redcap.sh          # Auto-sync script for development
 │   └── README.md               # Sync tool documentation
+├── simple_zip_creator.sh       # Simplified zip creation script (new)
 └── README.md                   # This file
 ```
 
@@ -34,14 +35,24 @@ The main demo showcases a dynamic form layout system that transforms standard RE
 - **REDCap Compatible**: Integrates with Shazam form system
 
 ### Quick Start
-1. Navigate to `Example/rc_conflux_demo/`
-2. Configure `loader_config.json` for your REDCap setup
-3. Deploy files to your REDCap Conflux directory
-4. See the demo-specific README for detailed instructions
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/osu-com-rit/REDCapCon2025_Conflux.git
+   cd REDCapCon2025_Conflux
+   ```
+
+2. Navigate to the demo directory:
+   ```bash
+   cd Example/rc_conflux_demo/
+   ```
+
+3. Configure `loader_config.json` for your REDCap setup
+4. Deploy files to your REDCap Conflux directory
+5. See the demo-specific README for detailed instructions
 
 ## Development Tools
 
-### File Synchronization (`sync_redcap.sh`)
+### File Synchronization (File\ Synchronization/sync_redcap.sh)
 Real-time file synchronization between your development directory and REDCap server.
 
 **Features:**
@@ -52,12 +63,14 @@ Real-time file synchronization between your development directory and REDCap ser
 
 **Usage:**
 ```bash
-cd "File Synchronization"
+cd "File Synchronization"/
 ./sync_redcap.sh
 ```
 
-### Zip Creation (`zip_creator.sh`)
-Automated packaging tool for creating distribution-ready zip files of your Conflux demos.
+### Zip Creation Tools
+
+#### Original Zip Creator (Creating\ Zip\ Files/zip_creator.sh)
+Advanced packaging tool for creating distribution-ready zip files from multiple demo folders.
 
 **Features:**
 - Package individual or all demo folders
@@ -67,7 +80,7 @@ Automated packaging tool for creating distribution-ready zip files of your Confl
 
 **Usage:**
 ```bash
-cd "Creating Zip Files"
+cd "Creating Zip Files"/
 
 # Create zip for all demos
 ./zip_creator.sh -a
@@ -77,6 +90,35 @@ cd "Creating Zip Files"
 
 # List available demos
 ./zip_creator.sh -l
+```
+
+#### Simplified Zip Creator (`simple_zip_creator.sh`)
+Easy-to-use packaging tool for single demo directory.
+
+**Features:**
+- Package demo files from current directory
+- Automatic file filtering (includes HTML, CSS, JS, JSON, Markdown)
+- Excludes development files (.DS_Store, .git, .tmp, etc.)
+- Configurable compression and naming
+- Preview mode to see what files will be included
+
+**Usage:**
+```bash
+# Copy script to demo directory
+cp simple_zip_creator.sh Example/rc_conflux_demo/
+cd Example/rc_conflux_demo/
+
+# Create zip with default name (rc_conflux_demo.zip)
+./simple_zip_creator.sh
+
+# Create zip with custom name
+./simple_zip_creator.sh my_custom_demo
+
+# Preview files that would be included
+./simple_zip_creator.sh -l
+
+# Show help
+./simple_zip_creator.sh -h
 ```
 
 ## System Requirements
@@ -89,21 +131,27 @@ cd "Creating Zip Files"
 ### For Development Tools
 - macOS or Linux system
 - fswatch (for sync tool)
-- zip utility (for packaging)
+- zip utility (for packaging - usually pre-installed)
 - rsync (usually pre-installed)
 
 ## Installation
 
 ### Demo Deployment
-1. **REDCap Integration:**
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/osu-com-rit/REDCapCon2025_Conflux.git
+   cd REDCapCon2025_Conflux
+   ```
+
+2. **REDCap Integration:**
    ```bash
    # Copy demo files to your REDCap Conflux directory
    cp -r Example/rc_conflux_demo/ /path/to/redcap/conflux/
    ```
 
-2. **Configure paths in `loader_config.json`**
+3. **Configure paths in `loader_config.json`**
 
-3. **Test the demo in your REDCap environment**
+4. **Test the demo in your REDCap environment**
 
 ### Development Setup
 1. **Install dependencies:**
@@ -117,14 +165,23 @@ cd "Creating Zip Files"
 
 2. **Configure sync script:**
    ```bash
-   # Edit paths in sync_redcap.sh
-   nano "File Synchronization/sync_redcap.sh"
+   # Edit paths in File Synchronization/sync_redcap.sh
+   nano "File Synchronization"/sync_redcap.sh
    ```
 
 3. **Make scripts executable:**
    ```bash
-   chmod +x "File Synchronization/sync_redcap.sh"
-   chmod +x "Creating Zip Files/zip_creator.sh"
+   chmod +x "File Synchronization"/sync_redcap.sh
+   chmod +x "Creating Zip Files"/zip_creator.sh
+   chmod +x simple_zip_creator.sh
+   ```
+
+4. **Set up simplified zip creator:**
+   ```bash
+   # Copy simplified zip creator to demo directory
+   cp simple_zip_creator.sh Example/rc_conflux_demo/
+   cd Example/rc_conflux_demo
+   chmod +x simple_zip_creator.sh
    ```
 
 ## Configuration
@@ -135,9 +192,9 @@ cd "Creating Zip Files"
 - Configure `loader_config.json` for REDCap integration
 
 ### Development Tools
-- **Sync Script**: Edit `SOURCE_DIR` and `DEST_DIR` variables
-- **Zip Creator**: Adjust `BASE_DIR` and `OUTPUT_DIR` paths
-- **File Filtering**: Modify `INCLUDE_FILES` and `EXCLUDE_PATTERNS` arrays
+- **Sync Script**: Edit `SOURCE_DIR` and `DEST_DIR` variables in `sync_redcap.sh`
+- **Zip Creator**: Runs from the demo directory, automatically finds files to include
+- **File Filtering**: Modify `INCLUDE_PATTERNS` and `EXCLUDE_PATTERNS` in the script if needed
 
 ## Browser Support
 - Chrome 60+
@@ -164,25 +221,47 @@ cd "Creating Zip Files"
 1. **Layout not switching**: Verify demo_switcher radio buttons exist
 2. **Styling conflicts**: Check CSS specificity and !important declarations  
 3. **Sync not working**: Confirm fswatch installation and directory permissions
-4. **Zip creation fails**: Verify zip utility installation and path configuration
+4. **Zip creation fails**: 
+   - Ensure you're running the script from the `rc_conflux_demo` directory
+   - Verify zip utility installation
+   - Check file permissions
 
 ### Debug Mode
-Enable logging in scripts:
+Enable logging and debugging:
 ```bash
 # For sync script
 tail -f ~/redcap_sync.log
 
-# For zip script  
-./create_zip.sh -l  # List available demos first
+# For zip script - preview files first
+cd rc_conflux_demo
+./simple_zip_creator.sh -l
+
+# Check current directory
+pwd  # Should show: /path/to/REDCapCon2025_Conflux/rc_conflux_demo
+```
+
+### Zip Creator Troubleshooting
+If you get "No matching files found" with the simplified zip creator:
+```bash
+# Verify you're in the correct directory
+pwd  # Should show: /path/to/REDCapCon2025_Conflux/Example/rc_conflux_demo
+
+# Check for demo files in the correct directory
+cd Example/rc_conflux_demo/
+ls -la *.html *.css *.js *.json
+
+# Make sure you're in the demo directory and run preview
+./simple_zip_creator.sh -l
 ```
 
 ## Contributing
 
 ### Development Workflow
-1. Use the sync script for real-time development
-2. Test changes in your REDCap environment
-3. Create zip packages for distribution
-4. Update documentation as needed
+1. Clone the repository
+2. Use the sync script for real-time development
+3. Test changes in your REDCap environment
+4. Create zip packages for distribution using the simple zip creator
+5. Update documentation as needed
 
 ### Code Standards
 - Maintain Bootstrap compatibility
@@ -196,10 +275,18 @@ This repository was created for REDCap Con 2025 to demonstrate:
 - Advanced form layout techniques
 - Development workflow optimization  
 - REDCap Conflux best practices
+- Rapid prototyping workflows
+
+## Repository Links
+
+- **GitHub**: https://github.com/osu-com-rit/REDCapCon2025_Conflux
+- **Issues**: Report bugs or request features via GitHub Issues
+- **Conflux Documentation**: See REDCap Conflux official documentation
 
 ## Support
 
 For questions about:
-- **Demo implementation**: See individual README files in each demo folder
-- **Development tools**: Check script comments and troubleshooting sections
+- **Demo implementation**: See `rc_conflux_demo/README.md`
+- **Development tools**: Check script comments and troubleshooting sections above
 - **REDCap integration**: Consult REDCap Conflux documentation
+- **Repository issues**: Create an issue on GitHub

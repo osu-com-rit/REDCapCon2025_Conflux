@@ -1,253 +1,187 @@
 #!/bin/bash
 
-# REDCap Conflux Zip Creator Script
-# 
-# This script creates zip files from REDCap Conflux demo folders, packaging
-# all necessary files (HTML, CSS, JS, JSON) for distribution or deployment.
+# Simple REDCap Conflux Demo Zip Creator
+# Creates a zip package from the current directory's demo files
 #
-# Author: [Your Name]
+# Usage: ./simple_zip_creator.sh [output_name]
+#
+# Author: Generated for REDCap Conflux Demo
 # Version: 1.0
-# Date: $(date +%Y-%m-%d)
 
-# =============================================================================
-# CONFIGURATION - Edit these paths to match your setup
-# =============================================================================
+set -e  # Exit on any error
 
-# Base directory containing your conflux demo folders
-BASE_DIR="/Users/PATH/REDCapCon2025_Conflux"
-
-# Output directory for zip files
-OUTPUT_DIR="$BASE_DIR/zip_packages"
-
-# Files to include in zip (space-separated patterns)
-INCLUDE_FILES=("*.html" "*.css" "*.js" "*.json" "README.md")
-
-# Files/directories to exclude (space-separated patterns)
-EXCLUDE_PATTERNS=(".git*" "*.tmp" "*.log" ".DS_Store" "node_modules")
-
-# Zip compression level (0-9, where 9 is highest compression)
+# Configuration
+DEFAULT_OUTPUT_NAME="rc_conflux_demo"
+OUTPUT_DIR="zip_packages"
 COMPRESSION_LEVEL=6
 
-# =============================================================================
-# FUNCTIONS
-# =============================================================================
+# File patterns to include
+INCLUDE_PATTERNS=("*.html" "*.css" "*.js" "*.json" "README.md" "*.md")
 
-# Function to display script header
-display_header() {
-    echo "======================================================"
-    echo "REDCap Conflux Zip Creator Script"
-    echo "======================================================"
-    echo "Base directory: $BASE_DIR"
+# Files to exclude
+EXCLUDE_PATTERNS=(".DS_Store" "*.tmp" "*.log" ".git*" "node_modules")
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    local color=$1
+    local message=$2
+    echo -e "${color}${message}${NC}"
+}
+
+print_header() {
+    echo "=================================================="
+    echo "REDCap Conflux Demo Zip Creator"
+    echo "=================================================="
+    echo "Current directory: $(pwd)"
     echo "Output directory: $OUTPUT_DIR"
-    echo "Compression level: $COMPRESSION_LEVEL"
     echo ""
 }
 
-# Function to check if zip command exists
-check_dependencies() {
-    if ! command -v zip &> /dev/null; then
-        echo "Error: zip command not found"
-        echo "Please install zip utility:"
-        echo "  macOS: Already installed"
-        echo "  Ubuntu: sudo apt-get install zip"
-        echo "  Windows: Use Git Bash or install via Chocolatey"
+check_files() {
+    local found_files=false
+    
+    print_status $YELLOW "Checking for files to include..."
+    
+    for pattern in "${INCLUDE_PATTERNS[@]}"; do
+        if compgen -G "$pattern" > /dev/null 2>&1; then
+            local count=$(ls -1 $pattern 2>/dev/null | wc -l)
+            echo "  Found $count file(s) matching: $pattern"
+            found_files=true
+        fi
+    done
+    
+    if [ "$found_files" = false ]; then
+        print_status $RED "Error: No matching files found to zip"
+        echo "Looking for files matching: ${INCLUDE_PATTERNS[*]}"
         exit 1
     fi
+    
+    echo ""
 }
 
-# Function to create output directory
-setup_output_dir() {
+create_output_dir() {
     if [ ! -d "$OUTPUT_DIR" ]; then
-        echo "Creating output directory: $OUTPUT_DIR"
-        mkdir -p "$OUTPUT_DIR" || {
-            echo "Error: Could not create output directory"
-            exit 1
-        }
+        print_status $YELLOW "Creating output directory: $OUTPUT_DIR"
+        mkdir -p "$OUTPUT_DIR"
     fi
 }
 
-# Function to build exclude parameters for zip command
-build_exclude_params() {
-    local exclude_params=""
-    for pattern in "${EXCLUDE_PATTERNS[@]}"; do
-        exclude_params="$exclude_params -x \"$pattern\""
-    done
-    echo "$exclude_params"
-}
-
-# Function to create zip for a single demo folder
-create_demo_zip() {
-    local demo_dir="$1"
-    local demo_name=$(basename "$demo_dir")
-    local zip_file="$OUTPUT_DIR/${demo_name}.zip"
+create_zip() {
+    local output_name="${1:-$DEFAULT_OUTPUT_NAME}"
+    local zip_file="$OUTPUT_DIR/${output_name}.zip"
     
-    echo "Processing: $demo_name"
+    print_status $YELLOW "Creating zip file: ${output_name}.zip"
     
-    # Check if demo directory exists
-    if [ ! -d "$demo_dir" ]; then
-        echo "  Warning: Directory not found, skipping"
-        return 1
+    # Remove existing zip if it exists
+    if [ -f "$zip_file" ]; then
+        rm "$zip_file"
+        echo "  Removed existing zip file"
     fi
     
-    # Change to demo directory
-    cd "$demo_dir" || {
-        echo "  Error: Could not access directory"
-        return 1
-    }
+    # Build the zip command
+    local zip_cmd="zip -$COMPRESSION_LEVEL \"$zip_file\""
     
-    # Build zip command with includes and excludes
-    local zip_cmd="zip -r$COMPRESSION_LEVEL \"$zip_file\""
-    
-    # Add include patterns
-    for pattern in "${INCLUDE_FILES[@]}"; do
-        if ls $pattern 1> /dev/null 2>&1; then
+    # Add files that exist
+    for pattern in "${INCLUDE_PATTERNS[@]}"; do
+        if compgen -G "$pattern" > /dev/null 2>&1; then
             zip_cmd="$zip_cmd $pattern"
         fi
     done
     
     # Add exclude patterns
-    for pattern in "${EXCLUDE_PATTERNS[@]}"; do
-        zip_cmd="$zip_cmd -x \"$pattern\""
+    for exclude in "${EXCLUDE_PATTERNS[@]}"; do
+        zip_cmd="$zip_cmd -x \"$exclude\""
     done
     
-    # Execute zip command
-    eval $zip_cmd > /dev/null 2>&1
-    
-    if [ $? -eq 0 ]; then
-        local size=$(du -h "$zip_file" | cut -f1)
-        echo "  ✓ Created: ${demo_name}.zip ($size)"
-        return 0
-    else
-        echo "  ✗ Failed to create zip file"
-        return 1
-    fi
-}
-
-# Function to list available demo folders
-list_demo_folders() {
-    echo "Available demo folders:"
-    local count=0
-    for dir in "$BASE_DIR"/*; do
-        if [ -d "$dir" ] && [ "$(basename "$dir")" != "zip_packages" ]; then
-            count=$((count + 1))
-            echo "  $count. $(basename "$dir")"
-        fi
-    done
-    
-    if [ $count -eq 0 ]; then
-        echo "  No demo folders found in $BASE_DIR"
-        return 1
-    fi
-    
-    return 0
-}
-
-# Function to create zip for all demo folders
-create_all_zips() {
-    echo "Creating zip files for all demo folders..."
-    echo ""
-    
-    local success_count=0
-    local total_count=0
-    
-    for dir in "$BASE_DIR"/*; do
-        if [ -d "$dir" ] && [ "$(basename "$dir")" != "zip_packages" ]; then
-            total_count=$((total_count + 1))
-            if create_demo_zip "$dir"; then
-                success_count=$((success_count + 1))
-            fi
-        fi
-    done
-    
-    echo ""
-    echo "Summary: $success_count/$total_count zip files created successfully"
-    
-    if [ $success_count -gt 0 ]; then
-        echo "Zip files saved to: $OUTPUT_DIR"
-        ls -la "$OUTPUT_DIR"/*.zip 2>/dev/null
-    fi
-}
-
-# Function to create zip for specific demo folder
-create_specific_zip() {
-    local demo_name="$1"
-    local demo_dir="$BASE_DIR/$demo_name"
-    
-    echo "Creating zip file for: $demo_name"
-    echo ""
-    
-    if create_demo_zip "$demo_dir"; then
+    # Execute the zip command
+    if eval $zip_cmd > /dev/null 2>&1; then
+        local file_size=$(du -h "$zip_file" | cut -f1)
+        local file_count=$(unzip -l "$zip_file" 2>/dev/null | tail -1 | awk '{print $2}')
+        
+        print_status $GREEN "Success! Created zip file with $file_count files ($file_size)"
+        echo "Location: $zip_file"
+        
+        # List contents
         echo ""
-        echo "Zip file created successfully!"
-        echo "Location: $OUTPUT_DIR/${demo_name}.zip"
-        ls -la "$OUTPUT_DIR/${demo_name}.zip"
+        echo "Zip contents:"
+        unzip -l "$zip_file" | grep -v "Archive:" | grep -v "Length" | grep -v "^-" | grep -v "files$" | awk '{print "  " $4}' | grep -v "^  $"
+        
     else
-        echo ""
-        echo "Failed to create zip file for $demo_name"
+        print_status $RED "Error: Failed to create zip file"
         exit 1
     fi
 }
 
-# Function to display usage
 show_usage() {
-    echo "Usage: $0 [OPTIONS] [DEMO_NAME]"
+    echo "Usage: $0 [OPTIONS] [OUTPUT_NAME]"
+    echo ""
+    echo "Creates a zip file from REDCap Conflux demo files in the current directory"
     echo ""
     echo "Options:"
-    echo "  -h, --help     Show this help message"
-    echo "  -l, --list     List available demo folders"
-    echo "  -a, --all      Create zip files for all demo folders"
+    echo "  -h, --help    Show this help message"
+    echo "  -l, --list    List files that would be included"
+    echo ""
+    echo "Arguments:"
+    echo "  OUTPUT_NAME   Name for the zip file (default: $DEFAULT_OUTPUT_NAME)"
     echo ""
     echo "Examples:"
-    echo "  $0 -a                    # Create zips for all demos"
-    echo "  $0 -l                    # List available demos"
-    echo "  $0 rc_conflux_demo       # Create zip for specific demo"
+    echo "  $0                    # Create $DEFAULT_OUTPUT_NAME.zip"
+    echo "  $0 my_demo            # Create my_demo.zip"
+    echo "  $0 -l                 # List files that would be included"
     echo ""
-    echo "Files included: ${INCLUDE_FILES[*]}"
-    echo "Files excluded: ${EXCLUDE_PATTERNS[*]}"
+    echo "Includes: ${INCLUDE_PATTERNS[*]}"
+    echo "Excludes: ${EXCLUDE_PATTERNS[*]}"
 }
 
-# Function to handle cleanup on exit
-cleanup() {
-    cd "$BASE_DIR" 2>/dev/null
+list_files() {
+    print_header
+    print_status $YELLOW "Files that would be included in zip:"
+    echo ""
+    
+    local total_files=0
+    for pattern in "${INCLUDE_PATTERNS[@]}"; do
+        if compgen -G "$pattern" > /dev/null 2>&1; then
+            echo "Files matching $pattern:"
+            for file in $pattern; do
+                if [ -f "$file" ]; then
+                    local size=$(du -h "$file" | cut -f1)
+                    echo "  $file ($size)"
+                    total_files=$((total_files + 1))
+                fi
+            done
+            echo ""
+        fi
+    done
+    
+    if [ $total_files -eq 0 ]; then
+        print_status $RED "No files found matching include patterns"
+    else
+        print_status $GREEN "Total files: $total_files"
+    fi
 }
 
-# =============================================================================
-# MAIN SCRIPT
-# =============================================================================
-
-# Set up signal handlers
-trap cleanup EXIT
-
-# Display header
-display_header
-
-# Check dependencies
-check_dependencies
-
-# Parse command line arguments
+# Main script logic
 case "${1:-}" in
     -h|--help)
         show_usage
         exit 0
         ;;
     -l|--list)
-        list_demo_folders
-        exit $?
-        ;;
-    -a|--all)
-        setup_output_dir
-        create_all_zips
+        list_files
         exit 0
-        ;;
-    "")
-        echo "No arguments provided. Use -h for help, -l to list demos, or specify a demo name."
-        echo ""
-        list_demo_folders
-        exit 1
         ;;
     *)
-        setup_output_dir
-        create_specific_zip "$1"
-        exit 0
+        print_header
+        check_files
+        create_output_dir
+        create_zip "$1"
+        echo ""
+        print_status $GREEN "Zip creation completed successfully!"
         ;;
 esac
