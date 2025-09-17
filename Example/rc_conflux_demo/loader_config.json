@@ -1,0 +1,14 @@
+{
+
+  "description": "REDCapCon 2025 Conflux Demo",
+
+  "fields": [
+    {
+      "field_name": "shazam_demo",
+      "html": "rc_demo.html",
+      "javascript": "rc_demo.js",
+      "css": "rc_demo.css"
+    }
+  ]
+
+}

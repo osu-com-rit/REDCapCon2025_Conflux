@@ -1,0 +1,28 @@
+  <div class="app" role="main">
+        <div class="demo-switcher-container">
+            <div class="edc-label">Choose layout</div>
+            <div class="edc-radio shazam">
+                <div class="edc-radio edc-label shazam">demo_switcher:label</div>
+                <div class="edc-radio shazam">demo_switcher</div>
+            </div>
+        </div>
+
+        <!-- Original source content (hidden but used to build structured UI) -->
+        <div id="edc-source">
+            <div id="edc-main-container">
+                <div class="edc-radio edc-label shazam">radio_1:label</div>
+                <div class="edc-radio shazam">radio_1</div>
+                <div class="edc-checkbox edc-label shazam">checkbox_1:label</div>
+                <div class="edc-checkbox shazam">checkbox_1</div>
+                <div class="edc-checkbox edc-label shazam" data-shazam-mirror-visibility="checkbox_1_other">checkbox_1_other:label</div>
+                <div class="edc-checkbox shazam" data-shazam-mirror-visibility="checkbox_1_other">checkbox_1_other</div>
+                <div class="edc-text edc-label shazam">text_1:label</div>
+                <div class="edc-text shazam">text_1</div>
+                <div class="edc-notes edc-label shazam">note_1:label</div>
+                <div class="edc-notes shazam">note_1</div>
+            </div>
+        </div>
+
+        <!-- Render target -->
+        <div id="edc-render" aria-live="polite" aria-busy="false"></div>
+    </div>

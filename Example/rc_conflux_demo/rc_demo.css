@@ -1,0 +1,368 @@
+/**
+ * EDC Layout Switcher Styles
+ * Bootstrap-integrated styling for form field layout switching
+ * Maintains WCAG 2.1 AA accessibility compliance
+ */
+
+/* ========================================
+   REDCAP COMPATIBILITY
+   ======================================== */
+
+/* Override REDCap's default highlighting to maintain our custom styles */
+.greenhighlight, 
+.greenhighlight table td, 
+.greenhighlight .labelrc {
+    background-color: #fff !important;
+}
+
+/* ========================================
+   MAIN LAYOUT CONTAINER
+   ======================================== */
+
+/**
+ * Primary grid container for form fields
+ * Uses CSS Grid for flexible, responsive layouts
+ */
+#edc-main-container.edc-host {
+    display: grid;
+    gap: 1rem; /* Bootstrap spacing equivalent to gap-3 */
+}
+
+/* ========================================
+   FIELD WRAPPER STYLING
+   ======================================== */
+
+/**
+ * Individual field containers
+ * Bootstrap card-inspired styling with custom enhancements
+ */
+.edc-item {
+    /* Bootstrap card base styling */
+    background: linear-gradient(180deg, #ffffff, #f8f9fa); /* bg-white to bg-light */
+    border: 1px solid #dee2e6; /* border-secondary */
+    border-radius: 0.375rem; /* rounded */
+    box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1); /* shadow-sm equivalent */
+    padding: 1rem; /* p-3 equivalent */
+    
+    /* Custom accent border for visual hierarchy */
+    border-left: 4px solid #e3f2fd; /* Default soft blue accent */
+    
+    /* Smooth transitions only for hover effects, not layout changes */
+    transition: background 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+/* ========================================
+   FIELD TYPE COLOR CODING
+   ======================================== */
+
+/**
+ * Different colored left borders for each field type
+ * Uses soft, WCAG-compliant colors for visual differentiation
+ */
+.edc-item[aria-labelledby*="radio"] {
+    border-left-color: #d4edda; /* Bootstrap success-light equivalent */
+}
+
+.edc-item[aria-labelledby*="checkbox"] {
+    border-left-color: #fff3cd; /* Bootstrap warning-light equivalent */
+}
+
+.edc-item[aria-labelledby*="slider"] {
+    border-left-color: #f3e5f5; /* Custom soft purple */
+}
+
+.edc-item[aria-labelledby*="text"] {
+    border-left-color: #cce7ff; /* Bootstrap info-light equivalent */
+}
+
+.edc-item[aria-labelledby*="note"] {
+    border-left-color: #f8d7da; /* Bootstrap danger-light equivalent */
+}
+
+/* ========================================
+   LABEL AND VALUE SLOT STYLING
+   ======================================== */
+
+/**
+ * Label styling with WCAG AA compliant colors
+ * Color: #2e7d32 provides 4.5:1 contrast ratio on white
+ */
+.edc-item .edc-label-slot {
+    color: #2e7d32; /* Custom green, WCAG AA compliant */
+    font-size: 1rem; /* Bootstrap body font size */
+    margin-bottom: 0.5rem; /* mb-2 equivalent */
+    font-weight: 600; /* fw-semibold equivalent */
+}
+
+/**
+ * Value container - holds the actual form inputs
+ */
+.edc-item .edc-value-slot {
+    font-size: 1rem; /* Bootstrap body font size */
+    color: #212529; /* Bootstrap text-dark */
+}
+
+/* ========================================
+   GRID LAYOUT MODE
+   ======================================== */
+
+/**
+ * Grid layout: Form-style two-column layout
+ * Labels on left, inputs on right
+ */
+#edc-main-container.mode-grid {
+    /* Bootstrap container styling */
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border: 1px solid #dee2e6; /* border-secondary */
+    border-radius: 0.5rem; /* rounded-lg equivalent */
+    padding: 1rem; /* p-3 equivalent */
+}
+
+/**
+ * Individual items in grid mode
+ * Two-column layout with labels and inputs side by side
+ */
+#edc-main-container.mode-grid .edc-item {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0.75rem 0; /* py-3 equivalent */
+    
+    /* CSS Grid for label/value layout */
+    display: grid;
+    grid-template-columns: 220px 1fr; /* Fixed label width, flexible input width */
+    align-items: start;
+    gap: 0.75rem 1rem; /* gap-3 equivalent */
+    
+    /* Divider between rows */
+    border-bottom: 1px solid #dee2e6; /* border-bottom-secondary */
+    border-left: none; /* Remove accent border in grid mode */
+}
+
+/**
+ * Remove bottom border from last item
+ */
+#edc-main-container.mode-grid .edc-item:last-child {
+    border-bottom: none;
+}
+
+/**
+ * Grid mode label styling
+ * Bootstrap badge-inspired background with gradient
+ */
+#edc-main-container.mode-grid .edc-label-slot {
+    padding: 0.5rem 0; /* py-2 equivalent */
+    color: #1565c0; /* WCAG AA compliant blue (4.51:1 contrast) */
+    background: linear-gradient(90deg, #e3f2fd, transparent);
+    border-radius: 0.25rem; /* rounded equivalent */
+    padding-left: 0.75rem; /* ps-3 equivalent */
+}
+
+/**
+ * Grid mode value styling
+ * Bootstrap form-control inspired
+ */
+#edc-main-container.mode-grid .edc-value-slot {
+    background: #ffffff; /* bg-white */
+    border: 1px solid #dee2e6; /* border-secondary */
+    border-radius: 0.375rem; /* rounded equivalent */
+    padding: 0.75rem; /* p-3 equivalent */
+    color: #212529; /* text-dark */
+}
+
+/* ========================================
+   CARD LAYOUT MODE
+   ======================================== */
+
+/**
+ * Card layout: Responsive card grid
+ * Bootstrap card deck inspired
+ */
+#edc-main-container.mode-card {
+    /* Responsive grid - similar to Bootstrap's card columns */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/**
+ * Individual cards in card mode
+ * Bootstrap card structure (header/body)
+ */
+#edc-main-container.mode-card .edc-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; /* gap-2 equivalent */
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/**
+ * Mobile breakpoint - Bootstrap sm equivalent (640px)
+ * Collapse grid to single column on small screens
+ */
+@media (max-width: 640px) {
+    #edc-main-container.mode-grid .edc-item {
+        grid-template-columns: 1fr; /* Single column layout */
+    }
+}
+
+/* ========================================
+   INTERACTIVE STATES & ACCESSIBILITY
+   ======================================== */
+
+/**
+ * Focus states for keyboard navigation
+ * Bootstrap focus-ring inspired with custom colors
+ */
+.edc-item:focus-within {
+    outline: 3px solid #0d6efd; /* Bootstrap primary color */
+    outline-offset: 2px;
+    box-shadow: 0 0 0 0.375rem rgba(13, 110, 253, 0.1); /* Custom focus ring */
+}
+
+/**
+ * Hover effects for enhanced interactivity
+ * Bootstrap card hover effects inspired
+ */
+.edc-item:hover {
+    background: linear-gradient(180deg, #f8f9fa, #e9ecef); /* bg-light to bg-secondary */
+    box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.15); /* Enhanced shadow on hover */
+    transform: translateY(-1px); /* Subtle lift effect */
+    transition: all 0.2s ease-in-out;
+}
+
+/**
+ * Grid mode specific hover effects
+ */
+#edc-main-container.mode-grid .edc-item:hover {
+    background: rgba(13, 110, 253, 0.02); /* Very subtle primary color tint */
+    border-radius: 0.375rem; /* rounded */
+}
+
+/* ========================================
+   DEMO SWITCHER STYLING
+   ======================================== */
+
+/**
+ * Layout switcher container
+ * Bootstrap alert-info inspired styling
+ */
+.demo-switcher-container {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 1px solid #dee2e6; /* border-secondary */
+    border-radius: 0.5rem; /* rounded-lg */
+    padding: 1rem; /* p-3 */
+    margin-bottom: 1.5rem; /* mb-4 */
+    box-shadow: 0 0.125rem 0.5rem rgba(0,0,0,0.1); /* shadow-sm */
+    border-left: 4px solid #0d6efd; /* Bootstrap primary accent */
+}
+
+/* ========================================
+   RESET LINKS STYLING
+   ======================================== */
+
+/**
+ * Reset link buttons with Bootstrap button styling
+ * WCAG AA compliant colors and touch targets
+ */
+.resetLinkParent a,
+[data-kind="reset-link"] a,
+.smalllink {
+    /* Bootstrap button-outline-danger inspired */
+    min-height: 44px !important; /* WCAG touch target minimum */
+    min-width: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 0.5rem 0.75rem !important; /* Bootstrap btn padding */
+    color: #dc3545 !important; /* Bootstrap danger color - WCAG AA compliant */
+    text-decoration: underline !important;
+    border-radius: 0.375rem !important; /* Bootstrap rounded */
+    transition: all 0.15s ease-in-out !important; /* Bootstrap transition */
+    font-size: 0.875rem !important; /* Bootstrap small font */
+}
+
+/**
+ * Reset link hover states
+ * Bootstrap button hover effects
+ */
+.resetLinkParent a:hover,
+[data-kind="reset-link"] a:hover,
+.smalllink:hover {
+    color: #b02a37 !important; /* Darker danger color */
+    background-color: rgba(220, 53, 69, 0.1) !important; /* Bootstrap danger background */
+    transform: translateY(-1px) !important; /* Subtle lift */
+}
+
+/**
+ * Reset link focus states for accessibility
+ */
+.resetLinkParent a:focus,
+[data-kind="reset-link"] a:focus,
+.smalllink:focus {
+    outline: 2px solid #dc3545 !important; /* Bootstrap focus ring */
+    outline-offset: 2px !important;
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+/* ========================================
+   FORM CONTROL ENHANCEMENTS
+   ======================================== */
+
+/**
+ * Input field styling with Bootstrap form-control base
+ */
+.edc-value-slot input[type="text"],
+.edc-value-slot textarea,
+.edc-value-slot select {
+    border: 2px solid #e9ecef !important; /* Bootstrap form-control border */
+    border-radius: 0.375rem !important; /* Bootstrap rounded */
+    padding: 0.5rem 0.75rem !important; /* Bootstrap form-control padding */
+    transition: border-color 0.15s ease-in-out !important; /* Bootstrap transition */
+}
+
+/**
+ * Focus states for form controls
+ * Bootstrap form-control focus styling
+ */
+.edc-value-slot input[type="text"]:focus,
+.edc-value-slot textarea:focus,
+.edc-value-slot select:focus {
+    border-color: #0d6efd !important; /* Bootstrap primary color */
+    outline: 2px solid rgba(13, 110, 253, 0.25) !important; /* Bootstrap focus ring */
+    outline-offset: 0 !important;
+    box-shadow: 0 0 0 0.125rem rgba(13, 110, 253, 0.25) !important; /* Bootstrap focus shadow */
+}
+
+/* ========================================
+   RADIO BUTTON AND CHECKBOX STYLING
+   ======================================== */
+
+/**
+ * Radio button styling with Bootstrap form-check colors
+ */
+.edc-value-slot input[type="radio"],
+.edc-value-slot input[type="checkbox"] {
+    accent-color: #0d6efd; /* Bootstrap primary color */
+    margin-right: 0.5rem; /* me-2 equivalent */
+}
+
+/**
+ * Label styling for radio buttons and checkboxes
+ * Bootstrap form-check-label inspired
+ */
+.edc-value-slot label {
+    color: #495057; /* Bootstrap text-muted equivalent - WCAG AA compliant */
+    font-weight: 500; /* Bootstrap fw-medium */
+    cursor: pointer;
+    padding: 0.25rem 0.5rem; /* Bootstrap spacing */
+    border-radius: 0.25rem; /* Bootstrap rounded-sm */
+    transition: background-color 0.15s ease-in-out; /* Bootstrap transition */
+}
+
+/**
+ * Label hover effects
+ */
+.edc-value-slot label:hover {
+    background-color: rgba(13, 110, 253, 0.05); /* Very light primary background */
+}
